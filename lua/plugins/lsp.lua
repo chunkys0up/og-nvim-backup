@@ -1,63 +1,35 @@
 return {
-    {
-        "neovim/nvim-lspconfig",
-        dependencies = {
-            -- LSP installer
-            { "mason-org/mason.nvim", opts = {} },
+	{
+		"neovim/nvim-lspconfig",
+		dependencies = {
+			{ "williamboman/mason.nvim", opts = {} },
+			"williamboman/mason-lspconfig.nvim",
+			"saghen/blink.cmp",
+		},
+		config = function()
+			local capabilities = require("blink.cmp").get_lsp_capabilities()
 
-            -- Bridge Mason → lspconfig
-            {
-                "mason-org/mason-lspconfig.nvim",
-                opts = {},
-                dependencies = {
-                    { "mason-org/mason.nvim", opts = {} },
-                    "neovim/nvim-lspconfig",
-                },
-            },
+			-- The list of servers to initialize
+			local servers = {
+				"lua_ls", -- Lua
+				"pyright", -- Python
+				"svelte", -- Svelte
+				"ts_ls", -- JavaScript, React, TypeScript
+				"clangd", -- C and C++
+			}
 
-            "saghen/blink.cmp",
-            {
-                "folke/lazydev.nvim",
-                opts = {
-                    library = {
-                        { path = "${3rd}/luv/library", words = { "vim%.uv" } },
-                    },
-                },
-            },
-        },
-        config = function()
-            local capabilities = require("blink.cmp").get_lsp_capabilities()
-            local servers = {
-                "lua_ls",
-                "ts_ls",
-                "pyright",
-            }
+			-- Initialize each server with the 0.11+ syntax
+			for _, server in ipairs(servers) do
+				-- Special configuration for clangd to prevent encoding warnings
+				local config = { capabilities = capabilities }
 
-            for _, lsp in ipairs(servers) do
-                vim.lsp.config(lsp, {
-                    capabilities = capabilities,
-                })
-                vim.lsp.enable({ lsp })
-            end
+				if server == "clangd" then
+					config.capabilities.offsetEncoding = { "utf-16" }
+				end
 
-            vim.api.nvim_create_autocmd("LspAttach", {
-                callback = function(args)
-                    local c = vim.lsp.get_client_by_id(args.data.client_id)
-                    if not c then
-                        return
-                    end
-
-                    if vim.bo.filetype == "lua" then
-                        -- Format the current buffer on save
-                        vim.api.nvim_create_autocmd("BufWritePre", {
-                            buffer = args.buf,
-                            callback = function()
-                                vim.lsp.buf.format({ bufnr = args.buf, id = c.id })
-                            end,
-                        })
-                    end
-                end,
-            })
-        end,
-    },
+				vim.lsp.config(server, config)
+				vim.lsp.enable(server)
+			end
+		end,
+	},
 }
