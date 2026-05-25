@@ -1,8 +1,11 @@
 vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>cd", vim.cmd.Ex)
-
-vim.keymap.set("n", "<leader>cf", function()
-	require("conform").format({
-		lsp_format = "fallback",
-	})
-end, { desc = "Format current file" })
+vim.keymap.set("n", "<leader>k", vim.lsp.buf.hover, { desc = "Hover docs" })
+vim.keymap.set("n", "gd", vim.lsp.buf.definition, { desc = "Go to definition" })
+vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { desc = "Go to declaration" })
+vim.keymap.set("n", "gr", vim.lsp.buf.references, { desc = "References" })
+vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { desc = "Go to implementation" })
+vim.keymap.set("n", "<leader>r", vim.lsp.buf.rename, { desc = "Rename" })
+vim.keymap.set("n", "<leader>c", vim.lsp.buf.code_action, { desc = "Code action" })
+vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, { desc = "Prev diagnostic" })
+vim.keymap.set("n", "]d", vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, { desc = "Show error" })

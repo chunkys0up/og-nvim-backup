@@ -1,3 +1,15 @@
+vim.loader.enable()
+
 require("config.options")
 require("config.keybinds")
-require("config.lazy")
+
+vim.lsp.enable({
+	"clangd",
+	"gopls",
+	"pyright",
+	"ts_ls",
+	"html",
+	"cssls",
+	"svelte",
+	"lua_ls",
+})
